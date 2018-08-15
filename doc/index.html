@@ -1,0 +1,211 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="utf-8"> <title>Studio Client</title> <style>html body{margin:0 auto 0 auto;padding:20px;max-width:1024px;font-family:sans-serif;font-size:14pt;overflow-y:scroll;}html body a{text-decoration:none;}html body a[href]{color:#0055AA;}html body a[href]:hover{color:#0088EE;}html body pre{background:#FAFAFA;border:1px solid #DDDDDD;padding:0.75em;overflow-x:auto;}html body pre >code a[href]{color:#223388;}article.system h1,article.system h2,article.system h3,article.system h4,article.system h5,article.system h6{margin:0.2em 0 0.1em 0;text-indent:1em;}article.system >header{text-align:center;}article.system >header img.logo{display:block;margin:auto;max-height:170px;}article.system >header h1{display:inline-block;text-indent:0;font-size:2.5em;}article.system >header .version{vertical-align:bottom;}article.system >header .languages{margin-top:-0.5em;text-transform:capitalize;}article.system >header .description{margin:0;}article.system >header .pages{margin-top:0.5em;font-size:1.2em;text-transform:capitalize;}article.system >header .pages a{display:inline-block;padding:0 0.2em;}article.system >section{margin:1em 0 1em 0;}article.system #index >ul{list-style:none;margin:0;padding:0;}article.system .row label{display:inline-block;min-width:6em;}article.system #system .row{display:flex;}article.system #system #dependencies{display:inline;margin:0;padding:0;}article.system #system #dependencies li{display:inline;padding:0 0.2em;}article.definition{margin:1em 0 0 0;}article.definition >header h1,article.definition >header h2,article.definition >header h3,article.definition >header h4,article.definition >header h5,article.definition >header h6{text-indent:0;display:inline-block;}article.definition >header ul{display:inline-block;list-style:none;margin:0;padding:0;}article.definition >header ul li{display:inline-block;padding:0 0.2em 0 0;}article.definition >header .visibility{display:none;}article.definition >header .visibility,article.definition >header .type{text-transform:lowercase;}article.definition >header .source-link{visibility:hidden;float:right;}article.definition >header .source-link:after{visibility:visible;content:"[SRC]";}article.definition .docstring{margin:0 0 0 1em;}article.definition .docstring pre{font-size:0.8em;white-space:pre-wrap;}.definition.package >header ul.nicknames{display:inline-block;list-style:none;margin:0;padding:0 0 0 1em;}.definition.package >header ul.nicknames li{display:inline;}.definition.package >header ul.nicknames:before{content:"(";}.definition.package >header ul.nicknames:after{content:")";}.definition.package ul.definitions{margin:0;list-style:none;padding:0 0 0 0.5em;}.definition.callable >header .name:before,.definition.type >header .name:before{content:"(";font-weight:normal;}.definition.callable >header .arguments:after,.definition.type >header .arguments:after{content:")";}.definition li>mark{background:none;border-left:0.3em solid #0088EE;padding-left:0.3em;display:block;}</style> </head> <body> <article class="system"> <header>  <h1>studio-client</h1> <span class="version">1.0.0</span> <nav class="languages">  <a href="index.html">English</a>  </nav> <p class="description">A client library for the Studio image hosting service</p> <nav class="pages">  <a href="index.html">studio client</a>  </nav> </header> <section id="documentation"><h2 id="about_studio-client">About Studio-Client</h2> <p>This is a common lisp client library for the <a href="https://github.com/Shirakumo/studio">Studio</a> image gallery hosting software.</p> <h2 id="how_to">How To</h2> <p>Note that this requires the <a href="https://github.com/Shirakumo/radiance-contribs/tree/master/r-oauth">r-oauth</a> module to be present on the Radiance instance Studio is hosted on. You will also need to create an oAuth application on the Radiance instance to authenticate through. On the default TyNET instance, this can be done in the <a href="http://admin.tymoon.eu/oauth/applications">admin panel</a>.</p> <p>Create your application and load up Studio-Client, including the <a href="https://shinmera.github.io/north">North</a> backend of your choice.</p> <pre><code>(ql:quickload '(studio-client north-drakma))
+</code></pre> <p>Once armed with an application key and secret, you can create a <code><a href="#CLASS%20STUDIO-CLIENT%3ACLIENT" class="xref">client</a></code> instance:</p> <pre><code>(<a href="http://l1sp.org/cl/defvar" class="xref">defvar</a> *client* (<a href="http://l1sp.org/cl/make-instance" class="xref">make-instance</a> 'studio-client:client 
+                   :api-base &lt;API-URL&gt;
+                   :key &lt;KEY&gt;
+                   :secret &lt;SECRET&gt;))
+</code></pre> <p>On the default TyNET instance the <code><a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AAPI-BASE" class="xref">api-base</a></code> would be <code>&quot;https://studio.tymoon.eu/api/&quot;</code>. Once a client has been created, start the oAuth flow with <code><a href="https://github.com/Shinmera/north#GENERIC-FUNCTION%20NORTH%3AINITIATE-AUTHENTICATION" class="xref">north:initiate-authentication</a></code> and visit the URL it returns.</p> <pre><code>(<a href="https://github.com/Shinmera/north#GENERIC-FUNCTION%20NORTH%3AINITIATE-AUTHENTICATION" class="xref">north:initiate-authentication</a> *client*)
+; =&gt; https://studio.tymoon.eu/api/oauth/authorize....
+</code></pre> <p>Once you have authorised the application on the page, copy the code it gives you and pass it to <code><a href="https://github.com/Shinmera/north#GENERIC-FUNCTION%20NORTH%3ACOMPLETE-AUTHENTICATION" class="xref">north:complete-authentication</a></code></p> <pre><code>(<a href="https://github.com/Shinmera/north#GENERIC-FUNCTION%20NORTH%3ACOMPLETE-AUTHENTICATION" class="xref">north:complete-authentication</a> *client* &quot;3D6E639C-A0A8-...&quot;)
+</code></pre> <p>If this succeeds you should be ready to query the Studio API without any problems.</p> <pre><code>(<a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERIES" class="xref">studio-client:galleries</a> *client*)
+; =&gt; (#&lt;STUDIO-CLIENT:GALLERY shinmera #1&gt; #&lt;STUDIO-CLIENT:GALLERY anon #11&gt; ...)
+(<a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOADS" class="xref">studio-client:uploads</a> *client* (<a href="http://l1sp.org/cl/first" class="xref">first</a> <a href="http://l1sp.org/cl/%2A" class="xref">*</a>))
+; =&gt; (#&lt;STUDIO-CLIENT:UPLOAD &quot;I know everything&quot; #1286&gt; ...)
+(<a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AFILE-URL" class="xref">studio-client:file-url</a> *client* (<a href="http://l1sp.org/cl/first" class="xref">first</a> (<a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AFILES" class="xref">studio-client:files</a> (<a href="http://l1sp.org/cl/first" class="xref">first</a> <a href="http://l1sp.org/cl/%2A" class="xref">*</a>))))
+; =&gt; http://studio.tymoon.eu/api/studio/file?id=1365
+</code></pre> <p>See the two primary objects <code><a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">gallery</a></code> and <code><a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">upload</a></code> for more information.</p> </section>  <section id="system"> <h2>System Information</h2>  <div class="row"> <label for="version">Version:</label> <a id="version">1.0.0</a> </div>   <div class="row"> <label for="dependencies">Dependencies:</label> <ul id="dependencies"><li><a class="external" href="https://github.com/Shinmera/documentation-utils">documentation-utils</a></li><li><a class="external" href="https://github.com/Shinmera/north">north-core</a></li><li><a class="external">babel</a></li><li><a class="external">yason</a></li></ul> </div>   <div class="row"> <label for="author">Author:</label> <a id="author" href="mailto:shinmera@tymoon.eu">Nicolas Hafner</a> </div>   <div class="row"> <label for="license">License:</label> <a id="license" href="https://github.com/Shinmera/studio-client/blob/master/LICENSE">Artistic</a> </div>   <div class="row"> <label for="homepage">Homepage:</label> <a id="homepage" href="https://github.com/Shinmera/studio-client">https://github.com/Shinmera/studio-client</a> </div>  </section>  <section id="index"> <h2>Definition Index</h2> <ul> <li> <article class="definition package" id="PACKAGE STUDIO-CLIENT"> <header> <h3> <a href="#PACKAGE%20STUDIO-CLIENT">STUDIO-CLIENT</a> </h3> <ul class="nicknames"> <li>ORG.SHIRAKUMO.STUDIO.CLIENT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> <ul class="definitions"> <li> <article class="definition class" id="CLASS STUDIO-CLIENT:CLIENT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20STUDIO-CLIENT%3ACLIENT">CLIENT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/studio-client/blob/master/client.lisp#L9">Source</a>  </header> <div class="docstring"><pre>The base client class for Studio connections.
+
+To start, you should create an instance of this client with the appropriate
+:API-BASE, which defaults to &quot;https://studio.tymoon.eu/api/&quot;. Then use
+North's functions NORTH:INITIATE-AUTHENTICATION and NORTH:COMPLETE-AUTHENTICATION
+to complete the authentication cycle.
+
+See <a href="https://github.com/Shinmera/north#CLASS%20NORTH%3ACLIENT" class="xref">NORTH:CLIENT</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AAPI-BASE" class="xref">API-BASE</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS STUDIO-CLIENT:GALLERY"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20STUDIO-CLIENT%3AGALLERY">GALLERY</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/studio-client/blob/master/client.lisp#L58">Source</a>  </header> <div class="docstring"><pre>Representation of a user's gallery in Studio.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AID" class="xref">ID</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AAUTHOR" class="xref">AUTHOR</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AURL" class="xref">URL</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ACOVER" class="xref">COVER</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ADESCRIPTION" class="xref">DESCRIPTION</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AMAKE-GALLERY" class="xref">MAKE-GALLERY</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERIES" class="xref">GALLERIES</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ADELETE" class="xref">DELETE</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ASAVE" class="xref">SAVE</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS STUDIO-CLIENT:UPLOAD"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20STUDIO-CLIENT%3AUPLOAD">UPLOAD</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/studio-client/blob/master/client.lisp#L102">Source</a>  </header> <div class="docstring"><pre>Representation of an upload in a gallery on a Studio instance.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AID" class="xref">ID</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AURL" class="xref">URL</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ATITLE" class="xref">TITLE</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AAUTHOR" class="xref">AUTHOR</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ATAGS" class="xref">TAGS</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ACREATED" class="xref">CREATED</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AVISIBILITY" class="xref">VISIBILITY</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ADESCRIPTION" class="xref">DESCRIPTION</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AFILES" class="xref">FILES</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AMAKE-UPLOAD" class="xref">MAKE-UPLOAD</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOADS" class="xref">UPLOADS</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:API-BASE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AAPI-BASE">API-BASE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Returns the base API URL that the client will send API requests to.
+
+See <a href="#CLASS%20STUDIO-CLIENT%3ACLIENT" class="xref">CLIENT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:AUTHOR"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AAUTHOR">AUTHOR</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Returns the name of the author of the object.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:COVER"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ACOVER">COVER</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Returns the ID of the upload that was set as the gallery's cover image, if any.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:(SETF COVER)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3A%28SETF%20COVER%29">(SETF COVER)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:CREATED"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ACREATED">CREATED</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Returns the universal-time timestamp of when the upload was created.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:(SETF CREATED)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3A%28SETF%20CREATED%29">(SETF CREATED)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:DELETE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ADELETE">DELETE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">CLIENT</li>  <li class="argument">GALLERY</li> </ul>  </header> <div class="docstring"><pre>Delete the given object on the Studio instance.
+
+This may fail if the authenticated user lacks the necessary permissions.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a>
+See <a href="#CLASS%20STUDIO-CLIENT%3ACLIENT" class="xref">CLIENT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:DESCRIPTION"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ADESCRIPTION">DESCRIPTION</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Returns the object's description string.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:(SETF DESCRIPTION)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3A%28SETF%20DESCRIPTION%29">(SETF DESCRIPTION)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:FILE-CONTENT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AFILE-CONTENT">FILE-CONTENT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">CLIENT</li>  <li class="argument">ID</li>  <li class="argument">&amp;KEY</li>  <li class="argument">THUMB</li> </ul>  </header> <div class="docstring"><pre>Returns the file's binary payload data as returned by the server.
+
+Returns an unsigned-byte 8 vector.
+
+This function will error if the requested file does not exist.</pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:FILE-URL"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AFILE-URL">FILE-URL</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">CLIENT</li>  <li class="argument">ID</li>  <li class="argument">&amp;KEY</li>  <li class="argument">THUMB</li> </ul>  </header> <div class="docstring"><pre>Returns the public URL to the file.</pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:FILES"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AFILES">FILES</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the list of files of the upload.
+
+Returned by the server are merely the file IDs, which you can
+turn into URLs and payloads with FILE-URL and FILE-CONTENT
+respectively.
+
+If you want to add new files, add the pathname to the file at the
+appropriate position in the file list.
+
+Note that setting this will only change the local object. In order
+to persist the changes, use SAVE.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ASAVE" class="xref">SAVE</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AFILE-URL" class="xref">FILE-URL</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AFILE-CONTENT" class="xref">FILE-CONTENT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:(SETF FILES)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3A%28SETF%20FILES%29">(SETF FILES)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:GALLERIES"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERIES">GALLERIES</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">CLIENT</li>  <li class="argument">&amp;KEY</li>  <li class="argument">START</li>  <li class="argument">END</li> </ul>  </header> <div class="docstring"><pre>Retrieve a listing of existing galleries on the Studio instance.
+
+Note that this may return less than the specified END if the server
+caps the number of galleries it returns (by default limited to 10).
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#CLASS%20STUDIO-CLIENT%3ACLIENT" class="xref">CLIENT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:GALLERY"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY">GALLERY</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">CLIENT</li>  <li class="argument">AUTHOR</li> </ul>  </header> <div class="docstring"><pre>Retrieve the gallery of the given author.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#CLASS%20STUDIO-CLIENT%3ACLIENT" class="xref">CLIENT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:ID"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AID">ID</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Returns an ID that identifies this object on Studio.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:MAKE-GALLERY"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AMAKE-GALLERY">MAKE-GALLERY</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">CLIENT</li>  <li class="argument">&amp;KEY</li>  <li class="argument">DESCRIPTION</li> </ul>  </header> <div class="docstring"><pre>Create a gallery for the authenticated user.
+
+Note that this will fail if a gallery already exists.
+
+This may fail if the authenticated user lacks the necessary permissions.
+
+Returns a fresh GALLERY instance if successful.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#CLASS%20STUDIO-CLIENT%3ACLIENT" class="xref">CLIENT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:MAKE-UPLOAD"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AMAKE-UPLOAD">MAKE-UPLOAD</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">CLIENT</li>  <li class="argument">TITLE</li>  <li class="argument">FILES</li>  <li class="argument">&amp;KEY</li>  <li class="argument">DESCRIPTION</li>  <li class="argument">TAGS</li>  <li class="argument">VISIBILITY</li> </ul>  </header> <div class="docstring"><pre>Create a new upload.
+
+FILES should be a list of pathnames to upload as the upload's files.
+VISIBILITY can be one of :PUBLIC :HIDDEN :PRIVATE.
+
+This may fail if the authenticated user lacks the necessary permissions.
+
+Returns a fresh UPLOAD instance if successful.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a>
+See <a href="#CLASS%20STUDIO-CLIENT%3ACLIENT" class="xref">CLIENT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:SAVE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ASAVE">SAVE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">CLIENT</li>  <li class="argument">GALLERY</li> </ul>  </header> <div class="docstring"><pre>Save potential changes made to the fields of the object on the Studio instance.
+
+This may fail if the authenticated user lacks the necessary permissions.
+
+Returns a fresh instance of the saved object as returned by the API.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a>
+See <a href="#CLASS%20STUDIO-CLIENT%3ACLIENT" class="xref">CLIENT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:TAGS"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ATAGS">TAGS</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the list of tags the upload is marked with.
+
+Note that setting this will only change the local object. In order
+to persist the changes, use SAVE.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ASAVE" class="xref">SAVE</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:(SETF TAGS)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3A%28SETF%20TAGS%29">(SETF TAGS)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:TITLE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ATITLE">TITLE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the upload's title.
+
+Note that setting this will only change the local object. In order
+to persist the changes, use SAVE.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ASAVE" class="xref">SAVE</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:(SETF TITLE)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3A%28SETF%20TITLE%29">(SETF TITLE)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:UPLOAD"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD">UPLOAD</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">CLIENT</li>  <li class="argument">ID</li> </ul>  </header> <div class="docstring"><pre>Retrieve the upload with the given ID.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a>
+See <a href="#CLASS%20STUDIO-CLIENT%3ACLIENT" class="xref">CLIENT</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:UPLOADS"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOADS">UPLOADS</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">CLIENT</li>  <li class="argument">AUTHOR</li>  <li class="argument">&amp;KEY</li>  <li class="argument">TAG</li>  <li class="argument">DATE</li>  <li class="argument">START</li>  <li class="argument">END</li> </ul>  </header> <div class="docstring"><pre>Retrieve a list of uploads for the given user or gallery.
+
+DATE should be a date string in the format &quot;MM.YYYY&quot;.
+
+Note that this may return less than the specified END if the server
+caps the number of uploads it returns (by default limited to 40).
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#CLASS%20STUDIO-CLIENT%3ACLIENT" class="xref">CLIENT</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:URL"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AURL">URL</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Returns the public URL to the given object.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AGALLERY" class="xref">GALLERY</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:VISIBILITY"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AVISIBILITY">VISIBILITY</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the visibility of the upload.
+
+The value may be one of: :PUBLIC :HIDDEN :PRIVATE
+
+Note that setting this will only change the local object. In order
+to persist the changes, use SAVE.
+
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3AUPLOAD" class="xref">UPLOAD</a>
+See <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3ASAVE" class="xref">SAVE</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION STUDIO-CLIENT:(SETF VISIBILITY)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20STUDIO-CLIENT%3A%28SETF%20VISIBILITY%29">(SETF VISIBILITY)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li> </ul> </article> </li> </ul> </section> </article> <script>window.addEventListener("DOMContentLoaded", function(){
+    var unmarkElement = function(el){
+        if(el.tagName === "mark" || el.tagName === "MARK"){
+            [].forEach.call(el.childNodes, function(child){
+                el.parentNode.insertBefore(child, el);
+            });
+            el.parentNode.removeChild(el);
+        }else if(el.parentNode.tagName === "mark"){
+            return unmarkElement(el.parentNode);
+        }
+        return null;
+    }
+
+    var unmarkAll = function(root){
+        root = root || document;
+        [].forEach.call(root.querySelectorAll("mark"), unmarkElement);
+    }
+    
+    var markElement = function(el){
+        if(el.parentNode.tagName === "mark" || el.parentNode.tagName === "MARK"){
+            return el.parentNode;
+        } else {
+            unmarkAll();
+            var marked = document.createElement("mark");
+            el.parentNode.insertBefore(marked, el);
+            marked.appendChild(el);
+            return marked;
+        }
+    }
+
+    var markFragmented = function(){
+        if(window.location.hash){
+            var el = document.getElementById(decodeURIComponent(window.location.hash.substr(1)));
+            if(el) markElement(el);
+        }
+    }
+
+    var registerXrefLink = function(link){
+        var el = document.getElementById(decodeURIComponent(link.getAttribute("href").substr(1)));
+        if(el){
+            link.addEventListener("click", function(){
+                markElement(el);
+            });
+        }
+    }
+
+    var registerXrefLinks = function(root){
+        root = root || document;
+        [].forEach.call(root.querySelectorAll("a.xref"), registerXrefLink);
+    }
+
+    markFragmented();
+    registerXrefLinks();
+}); </script> </body> </html> 

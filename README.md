@@ -28,5 +28,9 @@ If this succeeds you should be ready to query the Studio API without any problem
 
     (studio-client:galleries *client*)
     ; => (#<STUDIO-CLIENT:GALLERY shinmera #1> #<STUDIO-CLIENT:GALLERY anon #11> ...)
+    (studio-client:uploads *client* (first *))
+    ; => (#<STUDIO-CLIENT:UPLOAD "I know everything" #1286> ...)
+    (studio-client:file-url *client* (first (studio-client:files (first *))))
+    ; => http://studio.tymoon.eu/api/studio/file?id=1365
 
 See the two primary objects `gallery` and `upload` for more information.
