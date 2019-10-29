@@ -107,6 +107,7 @@
    (tags :initarg :tags :accessor tags)
    (created :initarg :created :accessor created)
    (visibility :initarg :visibility :accessor visibility)
+   (arrangement :initarg :arrangement :accessor arrangement)
    (description :initarg :description :accessor description)
    (files :initarg :files :accessor files)))
 
@@ -124,13 +125,17 @@
                          :visibility (cond ((string= "public" (gethash "visibility" data)) :public)
                                            ((string= "hidden" (gethash "visibility" data)) :hidden)
                                            ((string= "private" (gethash "visibility" data)) :private))
+                         :arrangement (cond ((string= "top-to-bottom" (gethash "arrangement" data)) :top-to-bottom)
+                                            ((string= "left-to-right" (gethash "arrangement" data)) :left-to-right)
+                                            ((string= "right-to-left" (gethash "arrangement" data)) :right-to-left)
+                                            ((string= "tiled" (gethash "arrangement" data)) :tiled))
                          :description (gethash "description" data)
                          :files (gethash "files" data)))
 
 (defmethod upload ((client client) id)
   (parse-upload (post client "studio/upload" :id id)))
 
-(defmethod make-upload ((client client) title files &key description tags (visibility :public))
+(defmethod make-upload ((client client) title files &key description tags (visibility :public) (arrangement :top-to-bottom))
   (parse-upload (post-file client "studio/upload/create"
                            (loop for file in files
                                  collect `("file[]" . ,file))
@@ -140,7 +145,12 @@
                            :visibility (ecase visibility
                                          (:public "public")
                                          (:hidden "hidden")
-                                         (:private "private")))))
+                                         (:private "private"))
+                           :arrangement (ecase arrangement
+                                          (:top-to-bottom "top-to-bottom")
+                                          (:left-to-right "left-to-right")
+                                          (:right-to-left "right-to-left")
+                                          (:tiled "tiled")))))
 
 (defmethod uploads ((client client) (author string) &key tag date (start 0) end)
   (mapcar #'parse-upload (post client "studio/upload/list"
@@ -165,7 +175,12 @@
         :visibility (ecase (visibility upload)
                       (:public "public")
                       (:hidden "hidden")
-                      (:private "private"))))
+                      (:private "private"))
+        :arrangement (ecase arrangement
+                       (:top-to-bottom "top-to-bottom")
+                       (:left-to-right "left-to-right")
+                       (:right-to-left "right-to-left")
+                       (:tiled "tiled"))))
 
 (defmethod file-url ((client client) id &key thumb)
   (format NIL "~a/studio/file?id=~d~@[&thumb=true~]" (api-base client) id thumb))
