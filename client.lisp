@@ -48,12 +48,12 @@
 (defmethod post ((client client) endpoint &rest parameters)
   (decode-radiance-payload
    (north:make-signed-request client (format NIL "~a/~a" (api-base client) endpoint)
-                              :post :params (plist->params parameters))))
+                              :post :params (plist->params (list* :format "json" parameters)))))
 
 (defmethod post-file ((client client) endpoint data &rest parameters)
   (decode-radiance-payload
    (north:make-signed-data-request client (format NIL "~a/~a" (api-base client) endpoint)
-                                   data :params (plist->params parameters))))
+                                   data :params (plist->params (list* :format "json" parameters)))))
 
 (defclass gallery ()
   ((id :initarg :id :reader id)
