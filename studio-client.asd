@@ -18,4 +18,4 @@
   :depends-on (:documentation-utils
                :north-core
                :babel
-               :yason))
+               :com.inuoe.jzon))

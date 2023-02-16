@@ -35,12 +35,11 @@
 (defgeneric post (client endpoint &rest parameters))
 
 (defun decode-radiance-payload (data)
-  (let ((json (yason:parse (etypecase data
-                             (string data)
-                             (vector (babel:octets-to-string data))
-                             (stream data))
-                           :json-booleans-as-symbols T
-                           :json-nulls-as-keyword NIL)))
+  (let ((json (com.inuoe.jzon:parse
+               (etypecase data
+                 (string data)
+                 (vector (babel:octets-to-string data))
+                 (stream data)))))
     (when (/= 200 (gethash "status" json))
       (error "Studio request failed: ~s" (gethash "message" json)))
     (gethash "data" json)))
